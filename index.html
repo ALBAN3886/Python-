@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 30 Jours — Plan d'apprentissage</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --accent: #f7c948;
+    --accent2: #5af0b0;
+    --accent3: #e05aff;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --border: #2a2a3a;
+    --w1: #5af0b0;
+    --w2: #4ac8ff;
+    --w3: #f7c948;
+    --w4: #e05aff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(247,201,72,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(247,201,72,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(247,201,72,0.12);
+    border: 1px solid rgba(247,201,72,0.3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  h1 span.py { color: var(--accent); }
+  h1 span.days { color: var(--accent2); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* STATS BAR */
+  .stats {
+    display: flex;
+    gap: 1px;
+    margin: 40px 0;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat {
+    flex: 1;
+    background: var(--surface);
+    padding: 20px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .stat:hover { background: var(--surface2); }
+
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* WEEK TABS */
+  .week-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .week-tab {
+    padding: 10px 22px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .week-tab:hover { border-color: var(--accent); color: var(--accent); }
+
+  .week-tab.active {
+    color: var(--bg);
+    border-color: transparent;
+    font-weight: 700;
+  }
+
+  .week-tab[data-week="1"].active { background: var(--w1); }
+  .week-tab[data-week="2"].active { background: var(--w2); }
+  .week-tab[data-week="3"].active { background: var(--w3); }
+  .week-tab[data-week="4"].active { background: var(--w4); }
+
+  /* WEEK SECTION */
+  .week-section { display: none; animation: fadeIn 0.3s ease; }
+  .week-section.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .week-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    border-radius: 4px;
+    border-left: 4px solid;
+  }
+
+  .week-section[data-week="1"] .week-header { background: rgba(90,240,176,0.07); border-color: var(--w1); }
+  .week-section[data-week="2"] .week-header { background: rgba(74,200,255,0.07); border-color: var(--w2); }
+  .week-section[data-week="3"] .week-header { background: rgba(247,201,72,0.07); border-color: var(--w3); }
+  .week-section[data-week="4"] .week-header { background: rgba(224,90,255,0.07); border-color: var(--w4); }
+
+  .week-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    opacity: 0.2;
+    line-height: 1;
+  }
+
+  .week-info h2 { font-size: 1.3rem; font-weight: 800; }
+  .week-info p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .week-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+
+  .week-section[data-week="1"] .week-badge { background: rgba(90,240,176,0.15); color: var(--w1); }
+  .week-section[data-week="2"] .week-badge { background: rgba(74,200,255,0.15); color: var(--w2); }
+  .week-section[data-week="3"] .week-badge { background: rgba(247,201,72,0.15); color: var(--w3); }
+  .week-section[data-week="4"] .week-badge { background: rgba(224,90,255,0.15); color: var(--w4); }
+
+  /* DAY CARDS */
+  .days-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .day-card:hover { border-color: rgba(247,201,72,0.3); }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .day-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 44px;
+    letter-spacing: 0.05em;
+  }
+
+  .day-title {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .day-tags {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .dtag {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .dtag.theory { background: rgba(74,200,255,0.15); color: var(--w2); }
+  .dtag.practice { background: rgba(90,240,176,0.15); color: var(--w1); }
+  .dtag.project { background: rgba(224,90,255,0.15); color: var(--w4); }
+  .dtag.review { background: rgba(247,201,72,0.15); color: var(--w3); }
+
+  .chevron {
+    color: var(--muted);
+    transition: transform 0.2s;
+    font-size: 12px;
+  }
+
+  .day-card.open .chevron { transform: rotate(180deg); }
+
+  .day-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .day-card.open .day-body { display: block; }
+
+  .section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin: 16px 0 8px;
+  }
+
+  .objectives { list-style: none; }
+
+  .objectives li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: #c8c8d8;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .objectives li:last-child { border-bottom: none; }
+
+  .objectives li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .resources { list-style: none; }
+
+  .resources li {
+    margin-bottom: 6px;
+  }
+
+  .resources li a {
+    color: var(--accent2);
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgba(74,200,255,0.05);
+    border-radius: 2px;
+    border: 1px solid rgba(74,200,255,0.1);
+    transition: all 0.15s;
+  }
+
+  .resources li a:hover {
+    background: rgba(74,200,255,0.12);
+    border-color: rgba(74,200,255,0.3);
+    color: #fff;
+  }
+
+  .resources li a::before { content: '↗'; opacity: 0.6; }
+
+  .time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  /* PROJECT CARD */
+  .project-card {
+    margin-top: 24px;
+    border-radius: 4px;
+    padding: 24px;
+    border: 1px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: 'PROJET';
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    opacity: 0.3;
+  }
+
+  .week-section[data-week="1"] .project-card { background: rgba(90,240,176,0.05); border-color: rgba(90,240,176,0.2); }
+  .week-section[data-week="2"] .project-card { background: rgba(74,200,255,0.05); border-color: rgba(74,200,255,0.2); }
+  .week-section[data-week="3"] .project-card { background: rgba(247,201,72,0.05); border-color: rgba(247,201,72,0.2); }
+  .week-section[data-week="4"] .project-card { background: rgba(224,90,255,0.05); border-color: rgba(224,90,255,0.2); }
+
+  .project-title {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .project-icon { font-size: 1.4rem; }
+
+  .project-desc { font-size: 13px; color: #b0b0c8; line-height: 1.6; }
+
+  .project-steps { list-style: none; margin-top: 12px; }
+
+  .project-steps li {
+    font-size: 12px;
+    color: #9090b0;
+    padding: 4px 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .project-steps li::before {
+    content: counter(step);
+    counter-increment: step;
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .project-steps { counter-reset: step; }
+
+  /* PROGRESS */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+
+  .progress-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 16px;
+  }
+
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 2px;
+    height: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--w1), var(--w2), var(--w3), var(--w4));
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+  }
+
+  .progress-info span { color: var(--accent); }
+
+  /* CHECKBOX */
+  .day-check {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 10px;
+  }
+
+  .day-check.done {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: var(--bg);
+  }
+
+  .day-card.done-card .day-title { opacity: 0.5; text-decoration: line-through; }
+
+  footer {
+    text-align: center;
+    padding: 40px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .stats { flex-wrap: wrap; }
+    .stat { min-width: 50%; }
+    .week-badge { display: none; }
+    .day-tags { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">Plan d'apprentissage gratuit</div>
+    <h1><span class="py">Python</span><br><span class="days">30 Jours</span></h1>
+    <p class="subtitle">// De zéro à intermédiaire — 100% gratuit</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">30</div><div class="stat-label">Jours</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Semaines</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Projets</div></div>
+    <div class="stat"><div class="stat-num">1h</div><div class="stat-label">/ jour</div></div>
+    <div class="stat"><div class="stat-num" id="done-count">0</div><div class="stat-label">Complétés</div></div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-title">// Progression globale</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div class="progress-info"><span id="progress-pct">0%</span><span>30 jours au total</span></div>
+  </div>
+
+  <div class="week-tabs">
+    <button class="week-tab active" data-week="1" onclick="showWeek(1)">Semaine 1 — Bases</button>
+    <button class="week-tab" data-week="2" onclick="showWeek(2)">Semaine 2 — Structures</button>
+    <button class="week-tab" data-week="3" onclick="showWeek(3)">Semaine 3 — Fonctions & Fichiers</button>
+    <button class="week-tab" data-week="4" onclick="showWeek(4)">Semaine 4 — POO & Modules</button>
+  </div>
+
+  <!-- SEMAINE 1 -->
+  <div class="week-section active" data-week="1">
+    <div class="week-header">
+      <div class="week-num">01</div>
+      <div class="week-info">
+        <h2>Les fondations de Python</h2>
+        <p>Variables, types, opérateurs, conditions, boucles</p>
+      </div>
+      <div class="week-badge">JOURS 1–7</div>
+    </div>
+
+    <div class="days-grid" id="week1-days">
+
+      <!-- JOUR 1 -->
+      <div class="day-card" id="day-1">
+        <div class="day-header" onclick="toggleDay('day-1')">
+          <div class="day-check" id="check-1" onclick="checkDay(event,'1')"></div>
+          <div class="day-num">J·01</div>
+          <div class="day-title">Installation & premier programme</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Installer Python 3 (python.org) et VS Code</li>
+            <li>Comprendre ce qu'est un interpréteur Python</li>
+            <li>Écrire et exécuter son premier <code>print("Hello World")</code></li>
+            <li>Utiliser le terminal / l'invite de commande basique</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.python.org/downloads/" target="_blank">python.org — Télécharger Python 3</a></li>
+            <li><a href="https://www.youtube.com/watch?v=7eh4d6sabA0" target="_blank">YouTube — Python Tutorial for Beginners (Programming with Mosh)</a></li>
+            <li><a href="https://docs.python.org/fr/3/tutorial/index.html" target="_blank">Documentation officielle Python (FR)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Installation + premiers pas</div>
+        </div>
+      </div>
+
+      <!-- JOUR 2 -->
+      <div class="day-card" id="day-2">
+        <div class="day-header" onclick="toggleDay('day-2')">
+          <div class="day-check" id="check-2" onclick="checkDay(event,'2')"></div>
+          <div class="day-num">J·02</div>
+          <div class="day-title">Variables & types de données</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Déclarer des variables : <code>nom = "Alban"</code>, <code>age = 25</code></li>
+            <li>Connaître les types : <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code></li>
+            <li>Utiliser <code>type()</code> pour identifier un type</li>
+            <li>Faire des conversions : <code>int("5")</code>, <code>str(42)</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_variables.asp" target="_blank">W3Schools — Python Variables</a></li>
+            <li><a href="https://www.youtube.com/watch?v=cQT33yu9pY8" target="_blank">YouTube — Variables & Data Types (Corey Schafer)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Exercices de variables</div>
+        </div>
+      </div>
+
+      <!-- JOUR 3 -->
+      <div class="day-card" id="day-3">
+        <div class="day-header" onclick="toggleDay('day-3')">
+          <div class="day-check" id="check-3" onclick="checkDay(event,'3')"></div>
+          <div class="day-num">J·03</div>
+          <div class="day-title">Opérateurs & expressions</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Opérateurs arithmétiques : <code>+, -, *, /, //, %, **</code></li>
+            <li>Opérateurs de comparaison : <code>==, !=, >, <, >=, <=</code></li>
+            <li>Opérateurs logiques : <code>and, or, not</code></li>
+            <li>Manipuler des chaînes : concaténation, f-strings</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_operators.asp" target="_blank">W3Schools — Python Operators</a></li>
+            <li><a href="https://replit.com/" target="_blank">Replit.com — Coder en ligne sans installation</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Mini-calculs et expressions</div>
+        </div>
+      </div>
+
+      <!-- JOUR 4 -->
+      <div class="day-card" id="day-4">
+        <div class="day-header" onclick="toggleDay('day-4')">
+          <div class="day-check" id="check-4" onclick="checkDay(event,'4')"></div>
+          <div class="day-num">J·04</div>
+          <div class="day-title">Conditions if / elif / else</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Écrire des blocs <code>if / elif / else</code></li>
+            <li>Comprendre l'indentation Python (4 espaces)</li>
+            <li>Utiliser <code>input()</code> pour saisir une valeur utilisateur</li>
+            <li>Créer un programme qui vérifie si un nombre est positif/négatif</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_conditions.asp" target="_blank">W3Schools — Python If...Else</a></li>
+            <li><a href="https://www.youtube.com/watch?v=f4KOjWS_KZs" target="_blank">YouTube — Conditions Python (Graven - FRENCH)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Programme interactif simple</div>
+        </div>
+      </div>
+
+      <!-- JOUR 5 -->
+      <div class="day-card" id="day-5">
+        <div class="day-header" onclick="toggleDay('day-5')">
+          <div class="day-check" id="check-5" onclick="checkDay(event,'5')"></div>
+          <div class="day-num">J·05</div>
+          <div class="day-title">Boucle while</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Comprendre la boucle <code>while</code> et sa condition d'arrêt</li>
+            <li>Utiliser <code>break</code> et <code>continue</code></li>
+            <li>Créer un compteur automatique de 1 à 10</li>
+            <li>Faire une boucle infinie sécurisée</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_while_loops.asp" target="_blank">W3Schools — Python While Loops</a></li>
+            <li><a href="https://www.youtube.com/watch?v=dHANJ4l6fwA" target="_blank">YouTube — Boucles Python (Corey Schafer)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Exercices de boucles</div>
+        </div>
+      </div>
+
+      <!-- JOUR 6 -->
+      <div class="day-card" id="day-6">
+        <div class="day-header" onclick="toggleDay('day-6')">
+          <div class="day-check" id="check-6" onclick="checkDay(event,'6')"></div>
+          <div class="day-num">J·06</div>
+          <div class="day-title">Boucle for & range()</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Utiliser <code>for i in range()</code> avec 1, 2 ou 3 arguments</li>
+            <li>Parcourir une chaîne de caractères lettre par lettre</li>
+            <li>Combiner <code>for</code> avec <code>if</code> pour filtrer</li>
+            <li>Afficher les tables de multiplication</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_for_loops.asp" target="_blank">W3Schools — Python For Loops</a></li>
+            <li><a href="https://docs.python.org/fr/3/library/stdtypes.html#range" target="_blank">Docs Python — range()</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Tables de multiplication</div>
+        </div>
+      </div>
+
+      <!-- JOUR 7 -->
+      <div class="day-card" id="day-7">
+        <div class="day-header" onclick="toggleDay('day-7')">
+          <div class="day-check" id="check-7" onclick="checkDay(event,'7')"></div>
+          <div class="day-num">J·07</div>
+          <div class="day-title">RÉVISION + Mini-projet S1</div>
+          <div class="day-tags"><span class="dtag project">Projet</span><span class="dtag review">Révision</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Relire et re-coder les exemples des jours 1–6</li>
+            <li>Identifier les points flous et les retravailler</li>
+            <li>Réaliser le mini-projet de la semaine</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.hackerrank.com/domains/python" target="_blank">HackerRank — Exercices Python débutant</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h30 — Révision + projet</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="project-card">
+      <div class="project-title"><span class="project-icon">🎮</span> Projet S1 — Jeu du nombre mystère</div>
+      <div class="project-desc">Crée un jeu en console où l'ordinateur choisit un nombre aléatoire entre 1 et 100, et le joueur doit le deviner. Le programme indique "trop grand", "trop petit" ou "bravo !" à chaque tentative.</div>
+      <ul class="project-steps">
+        <li>Générer un nombre aléatoire avec <code>import random</code> et <code>random.randint(1,100)</code></li>
+        <li>Demander la saisie du joueur avec <code>input()</code> et convertir en <code>int</code></li>
+        <li>Utiliser une boucle <code>while</code> qui tourne tant que le joueur n'a pas trouvé</li>
+        <li>Ajouter un compteur de tentatives et l'afficher à la victoire</li>
+        <li>Bonus : limiter à 7 tentatives et afficher "Perdu !" si dépassé</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEMAINE 2 -->
+  <div class="week-section" data-week="2">
+    <div class="week-header">
+      <div class="week-num">02</div>
+      <div class="week-info">
+        <h2>Structures de données</h2>
+        <p>Listes, tuples, dictionnaires, ensembles</p>
+      </div>
+      <div class="week-badge">JOURS 8–14</div>
+    </div>
+
+    <div class="days-grid">
+
+      <div class="day-card" id="day-8">
+        <div class="day-header" onclick="toggleDay('day-8')">
+          <div class="day-check" id="check-8" onclick="checkDay(event,'8')"></div>
+          <div class="day-num">J·08</div>
+          <div class="day-title">Listes — Création & manipulation</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Créer une liste : <code>fruits = ["mangue", "orange", "banane"]</code></li>
+            <li>Accéder par index (positif et négatif)</li>
+            <li>Modifier, ajouter (<code>append</code>), supprimer (<code>remove</code>, <code>pop</code>)</li>
+            <li>Parcourir une liste avec <code>for</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_lists.asp" target="_blank">W3Schools — Python Lists</a></li>
+            <li><a href="https://www.youtube.com/watch?v=W8KRzm-HUcc" target="_blank">YouTube — Lists in Python (Corey Schafer)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Exercices listes</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-9">
+        <div class="day-header" onclick="toggleDay('day-9')">
+          <div class="day-check" id="check-9" onclick="checkDay(event,'9')"></div>
+          <div class="day-num">J·09</div>
+          <div class="day-title">Listes avancées & slicing</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Slicing : <code>liste[1:4]</code>, <code>liste[::-1]</code></li>
+            <li>Méthodes : <code>sort()</code>, <code>reverse()</code>, <code>len()</code>, <code>count()</code></li>
+            <li>Listes imbriquées (matrices 2D)</li>
+            <li>List comprehension : <code>[x*2 for x in range(10)]</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_lists_comprehension.asp" target="_blank">W3Schools — List Comprehension</a></li>
+            <li><a href="https://docs.python.org/fr/3/tutorial/datastructures.html" target="_blank">Docs Python — Structures de données</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Manipulation avancée</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-10">
+        <div class="day-header" onclick="toggleDay('day-10')">
+          <div class="day-check" id="check-10" onclick="checkDay(event,'10')"></div>
+          <div class="day-num">J·10</div>
+          <div class="day-title">Tuples & ensembles (sets)</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Tuple : immuable, syntaxe <code>(a, b, c)</code>, déballage</li>
+            <li>Set : pas de doublons, opérations <code>union</code>, <code>intersection</code></li>
+            <li>Savoir quand utiliser tuple vs liste vs set</li>
+            <li>Convertir entre ces types</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_tuples.asp" target="_blank">W3Schools — Python Tuples</a></li>
+            <li><a href="https://www.w3schools.com/python/python_sets.asp" target="_blank">W3Schools — Python Sets</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Comparaison des types</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-11">
+        <div class="day-header" onclick="toggleDay('day-11')">
+          <div class="day-check" id="check-11" onclick="checkDay(event,'11')"></div>
+          <div class="day-num">J·11</div>
+          <div class="day-title">Dictionnaires — bases</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Créer un dictionnaire <code>{"clé": valeur}</code></li>
+            <li>Lire, modifier, ajouter, supprimer des clés</li>
+            <li>Méthodes : <code>keys()</code>, <code>values()</code>, <code>items()</code></li>
+            <li>Parcourir un dictionnaire avec <code>for</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_dictionaries.asp" target="_blank">W3Schools — Python Dictionaries</a></li>
+            <li><a href="https://www.youtube.com/watch?v=daefaLgNkw0" target="_blank">YouTube — Dictionaries (Corey Schafer)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Annuaire de contacts</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-12">
+        <div class="day-header" onclick="toggleDay('day-12')">
+          <div class="day-check" id="check-12" onclick="checkDay(event,'12')"></div>
+          <div class="day-num">J·12</div>
+          <div class="day-title">Dictionnaires avancés & imbriqués</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Dictionnaires imbriqués : données structurées</li>
+            <li>Dict comprehension : <code>{k: v for k, v in...}</code></li>
+            <li>Méthodes <code>get()</code>, <code>update()</code>, <code>pop()</code></li>
+            <li>Modéliser des données réelles (élève, produit, machine)</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://realpython.com/python-dicts/" target="_blank">Real Python — Python Dictionaries</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Modéliser des données</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-13">
+        <div class="day-header" onclick="toggleDay('day-13')">
+          <div class="day-check" id="check-13" onclick="checkDay(event,'13')"></div>
+          <div class="day-num">J·13</div>
+          <div class="day-title">Chaînes de caractères — méthodes</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li><code>upper()</code>, <code>lower()</code>, <code>strip()</code>, <code>replace()</code></li>
+            <li><code>split()</code>, <code>join()</code>, <code>find()</code>, <code>startswith()</code></li>
+            <li>Formatage : f-strings avancés <code>f"{val:.2f}"</code></li>
+            <li>Vérification : <code>isdigit()</code>, <code>isalpha()</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_strings_methods.asp" target="_blank">W3Schools — String Methods</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Traitement de texte</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-14">
+        <div class="day-header" onclick="toggleDay('day-14')">
+          <div class="day-check" id="check-14" onclick="checkDay(event,'14')"></div>
+          <div class="day-num">J·14</div>
+          <div class="day-title">RÉVISION + Mini-projet S2</div>
+          <div class="day-tags"><span class="dtag project">Projet</span><span class="dtag review">Révision</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Réviser listes, tuples, sets, dictionnaires</li>
+            <li>Réaliser le mini-projet de la semaine</li>
+            <li>S'entraîner sur HackerRank Python challenges</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.hackerrank.com/domains/python" target="_blank">HackerRank — Python Challenges</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h30 — Révision + projet</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="project-card">
+      <div class="project-title"><span class="project-icon">📒</span> Projet S2 — Gestionnaire de contacts</div>
+      <div class="project-desc">Crée un mini-répertoire en console. L'utilisateur peut ajouter, rechercher, modifier et supprimer des contacts. Chaque contact a un nom, un téléphone et une ville.</div>
+      <ul class="project-steps">
+        <li>Stocker les contacts dans une liste de dictionnaires</li>
+        <li>Menu principal avec <code>while True</code> et choix numérotés</li>
+        <li>Fonctions de recherche par nom (insensible à la casse avec <code>lower()</code>)</li>
+        <li>Afficher tous les contacts triés par nom avec <code>sorted()</code></li>
+        <li>Bonus : compter les contacts par ville avec un dictionnaire</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEMAINE 3 -->
+  <div class="week-section" data-week="3">
+    <div class="week-header">
+      <div class="week-num">03</div>
+      <div class="week-info">
+        <h2>Fonctions & Fichiers</h2>
+        <p>Fonctions, modules, gestion des erreurs, fichiers</p>
+      </div>
+      <div class="week-badge">JOURS 15–21</div>
+    </div>
+
+    <div class="days-grid">
+
+      <div class="day-card" id="day-15">
+        <div class="day-header" onclick="toggleDay('day-15')">
+          <div class="day-check" id="check-15" onclick="checkDay(event,'15')"></div>
+          <div class="day-num">J·15</div>
+          <div class="day-title">Fonctions — bases</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Définir une fonction avec <code>def nom(params):</code></li>
+            <li>Comprendre les paramètres et les arguments</li>
+            <li>Utiliser <code>return</code> pour retourner une valeur</li>
+            <li>Portée des variables : locale vs globale</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_functions.asp" target="_blank">W3Schools — Python Functions</a></li>
+            <li><a href="https://www.youtube.com/watch?v=9Os0o3wzS_I" target="_blank">YouTube — Functions (Corey Schafer)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Créer ses propres fonctions</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-16">
+        <div class="day-header" onclick="toggleDay('day-16')">
+          <div class="day-check" id="check-16" onclick="checkDay(event,'16')"></div>
+          <div class="day-num">J·16</div>
+          <div class="day-title">Fonctions avancées & lambda</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Paramètres par défaut : <code>def bonjour(nom="Monde"):</code></li>
+            <li><code>*args</code> et <code>**kwargs</code> pour arguments variables</li>
+            <li>Fonctions lambda : <code>carre = lambda x: x**2</code></li>
+            <li><code>map()</code>, <code>filter()</code>, <code>sorted(key=...)</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://realpython.com/python-lambda/" target="_blank">Real Python — Lambda Functions</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Fonctions avancées</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-17">
+        <div class="day-header" onclick="toggleDay('day-17')">
+          <div class="day-check" id="check-17" onclick="checkDay(event,'17')"></div>
+          <div class="day-num">J·17</div>
+          <div class="day-title">Modules & bibliothèques standard</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Importer un module : <code>import math</code>, <code>from math import sqrt</code></li>
+            <li>Modules utiles : <code>math</code>, <code>random</code>, <code>datetime</code>, <code>os</code></li>
+            <li>Créer son propre module (fichier .py séparé)</li>
+            <li>Utiliser <code>pip install</code> pour installer des packages externes</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://docs.python.org/fr/3/library/index.html" target="_blank">Docs Python — Bibliothèque standard</a></li>
+            <li><a href="https://www.w3schools.com/python/python_modules.asp" target="_blank">W3Schools — Python Modules</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Explorer les modules</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-18">
+        <div class="day-header" onclick="toggleDay('day-18')">
+          <div class="day-check" id="check-18" onclick="checkDay(event,'18')"></div>
+          <div class="day-num">J·18</div>
+          <div class="day-title">Gestion des exceptions (try/except)</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Comprendre les erreurs : <code>ValueError</code>, <code>TypeError</code>, <code>ZeroDivisionError</code></li>
+            <li>Blocs <code>try / except / else / finally</code></li>
+            <li>Lever une exception : <code>raise ValueError("message")</code></li>
+            <li>Écrire du code robuste qui ne plante pas</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_try_except.asp" target="_blank">W3Schools — Python Try Except</a></li>
+            <li><a href="https://realpython.com/python-exceptions/" target="_blank">Real Python — Python Exceptions</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Code anti-crash</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-19">
+        <div class="day-header" onclick="toggleDay('day-19')">
+          <div class="day-check" id="check-19" onclick="checkDay(event,'19')"></div>
+          <div class="day-num">J·19</div>
+          <div class="day-title">Lire & écrire des fichiers texte</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Ouvrir un fichier : <code>with open("fichier.txt", "r") as f:</code></li>
+            <li>Lire : <code>read()</code>, <code>readlines()</code></li>
+            <li>Écrire : mode <code>"w"</code> (écraser) et <code>"a"</code> (ajouter)</li>
+            <li>Sauvegarder des données dans un fichier</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_file_handling.asp" target="_blank">W3Schools — Python File Handling</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Journal de bord fichier</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-20">
+        <div class="day-header" onclick="toggleDay('day-20')">
+          <div class="day-check" id="check-20" onclick="checkDay(event,'20')"></div>
+          <div class="day-num">J·20</div>
+          <div class="day-title">Fichiers CSV & JSON</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Module <code>csv</code> : lire et écrire des tableaux</li>
+            <li>Module <code>json</code> : <code>json.dumps()</code> et <code>json.loads()</code></li>
+            <li>Sauvegarder des dictionnaires dans un fichier JSON</li>
+            <li>Lire un fichier CSV et calculer des statistiques</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://realpython.com/python-csv/" target="_blank">Real Python — Reading and Writing CSV Files</a></li>
+            <li><a href="https://realpython.com/python-json/" target="_blank">Real Python — Working With JSON Data</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Persistance de données</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-21">
+        <div class="day-header" onclick="toggleDay('day-21')">
+          <div class="day-check" id="check-21" onclick="checkDay(event,'21')"></div>
+          <div class="day-num">J·21</div>
+          <div class="day-title">RÉVISION + Mini-projet S3</div>
+          <div class="day-tags"><span class="dtag project">Projet</span><span class="dtag review">Révision</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Réviser fonctions, modules, exceptions, fichiers</li>
+            <li>Refactoriser le projet S2 avec des fonctions</li>
+            <li>Réaliser le mini-projet de la semaine</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.codewars.com/?language=python" target="_blank">Codewars — Kata Python (débutant)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h30 — Révision + projet</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="project-card">
+      <div class="project-title"><span class="project-icon">📊</span> Projet S3 — Calculateur de dépenses</div>
+      <div class="project-desc">Application console qui enregistre des dépenses (catégorie, montant, date), les sauvegarde dans un fichier JSON, et affiche un bilan mensuel avec total par catégorie.</div>
+      <ul class="project-steps">
+        <li>Créer des fonctions : <code>ajouter_depense()</code>, <code>afficher_bilan()</code>, <code>sauvegarder()</code></li>
+        <li>Sauvegarder les données dans <code>depenses.json</code> avec le module <code>json</code></li>
+        <li>Charger les données existantes au démarrage du programme</li>
+        <li>Calculer le total par catégorie avec un dictionnaire</li>
+        <li>Bonus : exporter le bilan dans un fichier <code>bilan.txt</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEMAINE 4 -->
+  <div class="week-section" data-week="4">
+    <div class="week-header">
+      <div class="week-num">04</div>
+      <div class="week-info">
+        <h2>POO & Niveau intermédiaire</h2>
+        <p>Classes, héritage, bibliothèques externes, projet final</p>
+      </div>
+      <div class="week-badge">JOURS 22–30</div>
+    </div>
+
+    <div class="days-grid">
+
+      <div class="day-card" id="day-22">
+        <div class="day-header" onclick="toggleDay('day-22')">
+          <div class="day-check" id="check-22" onclick="checkDay(event,'22')"></div>
+          <div class="day-num">J·22</div>
+          <div class="day-title">Programmation orientée objet — intro</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Comprendre classe vs objet vs instance</li>
+            <li>Définir une classe avec <code>class NomClasse:</code></li>
+            <li>Méthode <code>__init__</code> et <code>self</code></li>
+            <li>Créer des attributs et méthodes</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.youtube.com/watch?v=ZDa-Z5JzLYM" target="_blank">YouTube — OOP Python (Corey Schafer - Playlist)</a></li>
+            <li><a href="https://www.w3schools.com/python/python_classes.asp" target="_blank">W3Schools — Python Classes</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Première classe Python</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-23">
+        <div class="day-header" onclick="toggleDay('day-23')">
+          <div class="day-check" id="check-23" onclick="checkDay(event,'23')"></div>
+          <div class="day-num">J·23</div>
+          <div class="day-title">Méthodes spéciales & propriétés</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Méthodes dunder : <code>__str__</code>, <code>__repr__</code>, <code>__len__</code></li>
+            <li>Méthodes de classe <code>@classmethod</code> et statiques <code>@staticmethod</code></li>
+            <li>Propriétés avec <code>@property</code> et setters</li>
+            <li>Encapsulation : attributs privés <code>_nom</code> et <code>__nom</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://realpython.com/python-magic-methods/" target="_blank">Real Python — Magic Methods</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Classes avancées</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-24">
+        <div class="day-header" onclick="toggleDay('day-24')">
+          <div class="day-check" id="check-24" onclick="checkDay(event,'24')"></div>
+          <div class="day-num">J·24</div>
+          <div class="day-title">Héritage & polymorphisme</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Héritage : <code>class Chien(Animal):</code></li>
+            <li>Utiliser <code>super()</code> pour appeler la classe parente</li>
+            <li>Surcharger des méthodes (polymorphisme)</li>
+            <li>Vérifier l'héritage : <code>isinstance()</code>, <code>issubclass()</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.w3schools.com/python/python_inheritance.asp" target="_blank">W3Schools — Python Inheritance</a></li>
+            <li><a href="https://realpython.com/inheritance-composition-python/" target="_blank">Real Python — Héritage vs Composition</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Hiérarchie de classes</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-25">
+        <div class="day-header" onclick="toggleDay('day-25')">
+          <div class="day-check" id="check-25" onclick="checkDay(event,'25')"></div>
+          <div class="day-num">J·25</div>
+          <div class="day-title">Bibliothèques externes — pip & requests</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Installer une librairie : <code>pip install requests</code></li>
+            <li>Faire une requête HTTP GET avec <code>requests.get(url)</code></li>
+            <li>Analyser une réponse JSON d'une API publique</li>
+            <li>API exemple : wttr.in (météo) ou api.coindesk.com (Bitcoin)</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://requests.readthedocs.io/en/latest/" target="_blank">Docs requests — HTTP pour Python</a></li>
+            <li><a href="https://wttr.in/?format=j1" target="_blank">API wttr.in — Météo JSON gratuit</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Consommer une API</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-26">
+        <div class="day-header" onclick="toggleDay('day-26')">
+          <div class="day-check" id="check-26" onclick="checkDay(event,'26')"></div>
+          <div class="day-num">J·26</div>
+          <div class="day-title">Introduction à Pandas (analyse de données)</div>
+          <div class="day-tags"><span class="dtag practice">Pratique</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Installer pandas : <code>pip install pandas</code></li>
+            <li>Créer un DataFrame depuis un dict ou CSV</li>
+            <li>Filtrer, trier, grouper des données</li>
+            <li>Statistiques basiques : <code>describe()</code>, <code>mean()</code>, <code>value_counts()</code></li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://pandas.pydata.org/docs/getting_started/index.html" target="_blank">Docs Pandas — Getting started</a></li>
+            <li><a href="https://www.youtube.com/watch?v=vmEHCJofslg" target="_blank">YouTube — Pandas Crash Course (Keith Galli)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Analyser un CSV</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-27">
+        <div class="day-header" onclick="toggleDay('day-27')">
+          <div class="day-check" id="check-27" onclick="checkDay(event,'27')"></div>
+          <div class="day-num">J·27</div>
+          <div class="day-title">Débogage, tests & bonnes pratiques</div>
+          <div class="day-tags"><span class="dtag theory">Théorie</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Utiliser le débogueur de VS Code (breakpoints)</li>
+            <li>Écrire des tests simples avec <code>assert</code></li>
+            <li>Intro à <code>unittest</code> : premier test unitaire</li>
+            <li>Conventions PEP8 : nommage, espaces, longueur de lignes</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://realpython.com/python-debugging-pdb/" target="_blank">Real Python — Python Debugging</a></li>
+            <li><a href="https://peps.python.org/pep-0008/" target="_blank">PEP 8 — Style Guide for Python</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Code propre et testé</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-28">
+        <div class="day-header" onclick="toggleDay('day-28')">
+          <div class="day-check" id="check-28" onclick="checkDay(event,'28')"></div>
+          <div class="day-num">J·28</div>
+          <div class="day-title">Projet final — Planification</div>
+          <div class="day-tags"><span class="dtag project">Projet</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Définir clairement le périmètre du projet final</li>
+            <li>Créer la structure de fichiers du projet</li>
+            <li>Écrire le squelette des classes et fonctions (sans code)</li>
+            <li>Commencer l'implémentation des fonctions principales</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://github.com/" target="_blank">GitHub — Créer un repo pour son projet</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h — Architecture du projet</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-29">
+        <div class="day-header" onclick="toggleDay('day-29')">
+          <div class="day-check" id="check-29" onclick="checkDay(event,'29')"></div>
+          <div class="day-num">J·29</div>
+          <div class="day-title">Projet final — Développement</div>
+          <div class="day-tags"><span class="dtag project">Projet</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Implémenter toutes les fonctionnalités prévues</li>
+            <li>Gérer les erreurs avec try/except</li>
+            <li>Tester manuellement chaque fonctionnalité</li>
+            <li>Commenter le code et rédiger un README</li>
+          </ul>
+          <div class="section-title">// Ressources gratuites</div>
+          <ul class="resources">
+            <li><a href="https://www.makeareadme.com/" target="_blank">makeareadme.com — Créer un bon README</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~1h30 — Full code</div>
+        </div>
+      </div>
+
+      <div class="day-card" id="day-30">
+        <div class="day-header" onclick="toggleDay('day-30')">
+          <div class="day-check" id="check-30" onclick="checkDay(event,'30')"></div>
+          <div class="day-num">J·30</div>
+          <div class="day-title">🏁 BILAN — Et après ?</div>
+          <div class="day-tags"><span class="dtag review">Révision</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="day-body">
+          <div class="section-title">// Objectifs du jour</div>
+          <ul class="objectives">
+            <li>Finaliser et nettoyer le projet final</li>
+            <li>Publier sur GitHub avec un README clair</li>
+            <li>Lister ce que tu as appris en 30 jours</li>
+            <li>Choisir la prochaine spécialisation : Web (Django/Flask), Data Science, Automatisation, IA</li>
+          </ul>
+          <div class="section-title">// Ressources pour la suite</div>
+          <ul class="resources">
+            <li><a href="https://roadmap.sh/python" target="_blank">roadmap.sh — Python Developer Roadmap</a></li>
+            <li><a href="https://www.kaggle.com/learn/python" target="_blank">Kaggle — Python (gratuit, avec certificat)</a></li>
+            <li><a href="https://cs50.harvard.edu/python/2022/" target="_blank">Harvard CS50P — Python (gratuit)</a></li>
+          </ul>
+          <div class="time-badge">⏱ ~2h — Bilan + publication</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="project-card">
+      <div class="project-title"><span class="project-icon">🤖</span> Projet S4 — Bot météo en ligne de commande</div>
+      <div class="project-desc">Crée un programme Python orienté objet qui interroge une API météo gratuite, stocke l'historique des recherches dans un fichier JSON, et affiche les prévisions formatées dans le terminal.</div>
+      <ul class="project-steps">
+        <li>Classe <code>MeteoService</code> avec méthodes <code>get_weather(ville)</code> et <code>historique()</code></li>
+        <li>Appeler l'API <code>wttr.in/NomVille?format=j1</code> avec <code>requests</code></li>
+        <li>Parser le JSON et afficher température, conditions, humidité</li>
+        <li>Sauvegarder chaque recherche dans <code>historique.json</code></li>
+        <li>Bonus : comparer la météo de 2 villes côte à côte</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div>// Plan d'apprentissage Python 30 jours — 100% gratuit — Généré par Alban Eloh Technology</div>
+    <div style="margin-top:8px; color: #3a3a5a;">python.org · w3schools.com · realpython.com · youtube.com · docs.python.org</div>
+  </div>
+</footer>
+
+<script>
+  // Toggle day
+  function toggleDay(id) {
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+
+  // Show week
+  function showWeek(n) {
+    document.querySelectorAll('.week-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.week-section[data-week="${n}"]`).classList.add('active');
+    document.querySelector(`.week-tab[data-week="${n}"]`).classList.add('active');
+  }
+
+  // Check day
+  function checkDay(e, num) {
+    e.stopPropagation();
+    const check = document.getElementById('check-' + num);
+    const card = document.getElementById('day-' + num);
+    const done = check.classList.toggle('done');
+    check.textContent = done ? '✓' : '';
+    card.classList.toggle('done-card', done);
+    // Save
+    const saved = JSON.parse(localStorage.getItem('py30-done') || '{}');
+    saved[num] = done;
+    localStorage.setItem('py30-done', JSON.stringify(saved));
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const saved = JSON.parse(localStorage.getItem('py30-done') || '{}');
+    const count = Object.values(saved).filter(Boolean).length;
+    document.getElementById('done-count').textContent = count;
+    const pct = Math.round((count / 30) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+  }
+
+  // Load saved state
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = JSON.parse(localStorage.getItem('py30-done') || '{}');
+    for (const [num, done] of Object.entries(saved)) {
+      if (done) {
+        const check = document.getElementById('check-' + num);
+        const card = document.getElementById('day-' + num);
+        if (check) { check.classList.add('done'); check.textContent = '✓'; }
+        if (card) card.classList.add('done-card');
+      }
+    }
+    updateProgress();
+  });
+</script>
+</body>
+</html>
